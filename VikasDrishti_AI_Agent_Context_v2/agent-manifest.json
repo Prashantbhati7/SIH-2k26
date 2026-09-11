@@ -1,0 +1,42 @@
+{
+  "name": "VikasDrishti AI Agent Context Pack v2",
+  "source_priority": [
+    "source-final.ipynb",
+    "source-sih-ppt.pdf",
+    "docs/00-MASTER-AGENT-INSTRUCTIONS.md"
+  ],
+  "stack": {
+    "frontend": "React + TypeScript + Vite",
+    "backend": "Node.js + Express + TypeScript",
+    "database": "PostgreSQL + Prisma",
+    "ml": "Python FastAPI + XGBoost + SHAP",
+    "llm": "Optional Ollama"
+  },
+  "core_loop": [
+    "PREDICT",
+    "EXPLAIN",
+    "WARN",
+    "PRESCRIBE",
+    "ACT",
+    "VERIFY",
+    "LEARN"
+  ],
+  "roles": [
+    "MINISTER_POLICYMAKER",
+    "PROJECT_MANAGER",
+    "FIELD_OFFICER",
+    "CONTRACTOR"
+  ],
+  "current_models": [
+    "COST_OVERRUN_XGBOOST",
+    "FUTURE_DELAY_XGBOOST",
+    "FUTURE_RISK_XGBOOST"
+  ],
+  "current_prediction_horizon": "next available snapshot",
+  "nonnegotiable": [
+    "no fabricated metrics",
+    "no fabricated integrations",
+    "backend RBAC",
+    "no disconnected mock screens"
+  ]
+}
