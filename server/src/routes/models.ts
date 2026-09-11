@@ -9,7 +9,59 @@ const ML_SERVICE_URL = process.env.ML_SERVICE_URL || 'http://localhost:8000';
 router.get('/', authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
     const mlRes = await axios.get(`${ML_SERVICE_URL}/models`);
-    return res.json(mlRes.data);
+    const rawData = mlRes.data;
+    const formattedModels = (rawData.models || []).map((m: any) => {
+      const version = m.version || '';
+      let name = m.name;
+      let type = m.type;
+      let limitationNote = m.limitationNote;
+
+      if (version.includes('COST')) {
+        name = name || 'Cost Overrun Model';
+        type = type || 'XGBClassifier Multiclass (multi:softprob)';
+        limitationNote = limitationNote || 'Weak recall (0.17) on Minor overrun class due to target imbalance.';
+      } else if (version.includes('DELAY')) {
+        name = name || 'Future Delay Model';
+        type = type || 'XGBClassifier Multiclass (multi:softprob)';
+      } else if (version.includes('RISK')) {
+        name = name || 'Future Risk Model';
+        type = type || 'XGBClassifier Binary (binary:logistic)';
+        limitationNote = limitationNote || 'High Risk recall is 0.50. Operates as a screening risk indicator.';
+      }
+
+      const baselineAcc = m.baselineAccuracy ?? m.baseline_accuracy ?? 0;
+      const modelAcc = m.modelAccuracy ?? m.model_accuracy ?? 0;
+      const macroF1Val = m.macroF1 ?? m.macro_f1 ?? 0;
+
+      return {
+        ...m,
+        name,
+        type,
+        limitationNote,
+        baselineAccuracy: baselineAcc,
+        baseline_accuracy: baselineAcc,
+        modelAccuracy: modelAcc,
+        model_accuracy: modelAcc,
+        macroF1: macroF1Val,
+        macro_f1: macroF1Val,
+        featureCount: m.featureCount || 13
+      };
+    });
+
+    return res.json({
+      models: formattedModels,
+      methodology: {
+        split: rawData.train_split || 'GroupShuffleSplit(n_splits=1, test_size=0.25, random_state=42)',
+        groupKey: 'project_code',
+        rationale: 'Project-level grouping prevents data leakage between monthly reporting snapshots of the same project.',
+        explainability: 'SHAP TreeExplainer (top 5 absolute SHAP impact values per snapshot)'
+      },
+      cufVsEnrichedStory: {
+        current: 'Implemented & Evaluated CUF/PAIMANA XGBoost Models (13 features)',
+        pilot: 'Daily Field Officer & Contractor ground execution data collection',
+        future: 'CUF + Enriched feature engineering, retraining & comparative evaluation'
+      }
+    });
   } catch (error) {
     // Fallback model cards grounded in source-final.ipynb evaluation
     return res.json({

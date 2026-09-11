@@ -10,11 +10,9 @@ import {
   Cpu, 
   FileText, 
   History,
-  Sparkles,
   UserCheck,
   HardHat,
-  Compass,
-  ArrowRightLeft
+  ChevronRight
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -35,47 +33,51 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const isField = userRole === 'FIELD_OFFICER';
   const isContractor = userRole === 'CONTRACTOR';
 
+  const getItemClass = (tabName: string) => {
+    const isActive = activeTab === tabName;
+    if (isActive) {
+      return 'w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold bg-lime-400 text-slate-950 shadow-sm transition-all';
+    }
+    return 'w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-800/80 transition-all';
+  };
+
   return (
     <aside className="w-64 bg-slate-900 border-r border-slate-800 text-slate-300 flex flex-col justify-between shrink-0 hidden md:flex">
       <div className="p-4 space-y-6 overflow-y-auto">
-        {/* Active Role Indicator Card */}
-        <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800/80">
-          <div className="text-[10px] uppercase font-bold text-slate-400 tracking-wider mb-1">
-            Active Role View
-          </div>
-          <div className="flex items-center space-x-2">
-            <div className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping" />
-            <span className="text-xs font-bold text-slate-100">
-              {isMinister && 'Minister / Policymaker'}
-              {isManager && 'Project Manager / Ministry'}
-              {isField && 'Field Inspection Officer'}
-              {isContractor && 'Contractor / Implementer'}
+        {/* Role Context Summary */}
+        <div className="p-3.5 rounded-2xl bg-slate-800/50 border border-slate-700/60 space-y-1">
+          <div className="flex items-center justify-between">
+            <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">
+              Viewing Role
             </span>
+            <span className="w-2 h-2 rounded-full bg-lime-400" />
           </div>
-          <p className="text-[11px] text-slate-400 mt-1">
-            {isMinister && 'Portfolio Intelligence → Prioritize Intervention'}
-            {isManager && 'Project Monitoring → Assign & Escalate'}
-            {isField && 'Ground Verification → Track Progress'}
-            {isContractor && 'Execution Intelligence → Update Tasks'}
-          </p>
+          <div className="text-xs font-bold text-white">
+            {isMinister && 'Minister / Policymaker'}
+            {isManager && 'Project Manager / Ministry'}
+            {isField && 'Field Inspection Officer'}
+            {isContractor && 'Contractor / Implementer'}
+          </div>
+          <div className="text-[11px] text-slate-400">
+            {isMinister && 'National Portfolio Risk Overview'}
+            {isManager && 'Project Monitoring & Interventions'}
+            {isField && 'Ground Verification Feed'}
+            {isContractor && 'Milestone & Task Execution'}
+          </div>
         </div>
 
-        {/* Main Navigation Sections */}
+        {/* Section 1: Portfolio Navigation */}
         <div className="space-y-1">
           <div className="px-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">
-            Intelligence Command
+            Project Navigation
           </div>
 
-          <button
-            onClick={() => setActiveTab('dashboard')}
-            className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-xs font-medium transition-all ${
-              activeTab === 'dashboard'
-                ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
-                : 'hover:bg-slate-800/60 text-slate-300'
-            }`}
-          >
-            <LayoutDashboard className="w-4 h-4 text-indigo-400" />
-            <span>Role Dashboard</span>
+          <button onClick={() => setActiveTab('dashboard')} className={getItemClass('dashboard')}>
+            <div className="flex items-center space-x-3">
+              <LayoutDashboard className="w-4 h-4" />
+              <span>Portfolio Overview</span>
+            </div>
+            {activeTab === 'dashboard' && <ChevronRight className="w-3.5 h-3.5" />}
           </button>
 
           <button
@@ -83,159 +85,121 @@ export const Sidebar: React.FC<SidebarProps> = ({
               setActiveTab('project_profile');
               onSelectProject(40001);
             }}
-            className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-xs font-medium transition-all ${
-              activeTab === 'project_profile'
-                ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
-                : 'hover:bg-slate-800/60 text-slate-300'
-            }`}
+            className={getItemClass('project_profile')}
           >
-            <FolderKanban className="w-4 h-4 text-purple-400" />
-            <span>Core Digital Profile</span>
-            <span className="ml-auto text-[9px] px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300 font-bold">
-              Slice
-            </span>
+            <div className="flex items-center space-x-3">
+              <FolderKanban className="w-4 h-4" />
+              <span>Project Profile</span>
+            </div>
+            {activeTab === 'project_profile' && <ChevronRight className="w-3.5 h-3.5" />}
           </button>
 
           {(isMinister || isManager) && (
             <>
-              <button
-                onClick={() => setActiveTab('warnings')}
-                className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-xs font-medium transition-all ${
-                  activeTab === 'warnings'
-                    ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
-                    : 'hover:bg-slate-800/60 text-slate-300'
-                }`}
-              >
-                <AlertTriangle className="w-4 h-4 text-amber-400" />
-                <span>Early Warning Center</span>
+              <button onClick={() => setActiveTab('warnings')} className={getItemClass('warnings')}>
+                <div className="flex items-center space-x-3">
+                  <AlertTriangle className="w-4 h-4" />
+                  <span>Early Warning Center</span>
+                </div>
+                {activeTab === 'warnings' && <ChevronRight className="w-3.5 h-3.5" />}
               </button>
 
-              <button
-                onClick={() => setActiveTab('interventions')}
-                className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-xs font-medium transition-all ${
-                  activeTab === 'interventions'
-                    ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
-                    : 'hover:bg-slate-800/60 text-slate-300'
-                }`}
-              >
-                <CheckSquare className="w-4 h-4 text-emerald-400" />
-                <span>Intervention Center</span>
+              <button onClick={() => setActiveTab('interventions')} className={getItemClass('interventions')}>
+                <div className="flex items-center space-x-3">
+                  <CheckSquare className="w-4 h-4" />
+                  <span>Interventions</span>
+                </div>
+                {activeTab === 'interventions' && <ChevronRight className="w-3.5 h-3.5" />}
               </button>
 
-              <button
-                onClick={() => setActiveTab('risk_map')}
-                className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-xs font-medium transition-all ${
-                  activeTab === 'risk_map'
-                    ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
-                    : 'hover:bg-slate-800/60 text-slate-300'
-                }`}
-              >
-                <MapPin className="w-4 h-4 text-red-400" />
-                <span>India Risk Map</span>
+              <button onClick={() => setActiveTab('risk_map')} className={getItemClass('risk_map')}>
+                <div className="flex items-center space-x-3">
+                  <MapPin className="w-4 h-4" />
+                  <span>India Risk Map</span>
+                </div>
+                {activeTab === 'risk_map' && <ChevronRight className="w-3.5 h-3.5" />}
               </button>
 
-              <button
-                onClick={() => setActiveTab('benchmarking')}
-                className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-xs font-medium transition-all ${
-                  activeTab === 'benchmarking'
-                    ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
-                    : 'hover:bg-slate-800/60 text-slate-300'
-                }`}
-              >
-                <BarChart3 className="w-4 h-4 text-cyan-400" />
-                <span>Sector Benchmarking</span>
+              <button onClick={() => setActiveTab('benchmarking')} className={getItemClass('benchmarking')}>
+                <div className="flex items-center space-x-3">
+                  <BarChart3 className="w-4 h-4" />
+                  <span>Sector Benchmarking</span>
+                </div>
+                {activeTab === 'benchmarking' && <ChevronRight className="w-3.5 h-3.5" />}
               </button>
             </>
           )}
 
           {isField && (
-            <button
-              onClick={() => setActiveTab('dashboard')}
-              className="w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-xs font-medium hover:bg-slate-800/60 text-slate-300"
-            >
-              <UserCheck className="w-4 h-4 text-emerald-400" />
-              <span>Ground Verification</span>
+            <button onClick={() => setActiveTab('dashboard')} className={getItemClass('dashboard')}>
+              <div className="flex items-center space-x-3">
+                <UserCheck className="w-4 h-4" />
+                <span>Ground Verification</span>
+              </div>
             </button>
           )}
 
           {isContractor && (
-            <button
-              onClick={() => setActiveTab('dashboard')}
-              className="w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-xs font-medium hover:bg-slate-800/60 text-slate-300"
-            >
-              <HardHat className="w-4 h-4 text-amber-400" />
-              <span>Execution Progress</span>
+            <button onClick={() => setActiveTab('dashboard')} className={getItemClass('dashboard')}>
+              <div className="flex items-center space-x-3">
+                <HardHat className="w-4 h-4" />
+                <span>Execution Tasks</span>
+              </div>
             </button>
           )}
         </div>
 
-        {/* Analytics & Lab Section */}
+        {/* Section 2: Data & Governance */}
         <div className="space-y-1">
           <div className="px-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">
-            Data & AI Transparency
+            Data & Governance
           </div>
 
-          <button
-            onClick={() => setActiveTab('model_lab')}
-            className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-xs font-medium transition-all ${
-              activeTab === 'model_lab'
-                ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
-                : 'hover:bg-slate-800/60 text-slate-300'
-            }`}
-          >
-            <Cpu className="w-4 h-4 text-indigo-400" />
-            <span>Model Intelligence Lab</span>
+          <button onClick={() => setActiveTab('model_lab')} className={getItemClass('model_lab')}>
+            <div className="flex items-center space-x-3">
+              <Cpu className="w-4 h-4" />
+              <span>Model Intelligence Lab</span>
+            </div>
+            {activeTab === 'model_lab' && <ChevronRight className="w-3.5 h-3.5" />}
           </button>
 
           {(isMinister || isManager) && (
-            <button
-              onClick={() => setActiveTab('data_upload')}
-              className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-xs font-medium transition-all ${
-                activeTab === 'data_upload'
-                  ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
-                  : 'hover:bg-slate-800/60 text-slate-300'
-              }`}
-            >
-              <UploadCloud className="w-4 h-4 text-teal-400" />
-              <span>Monthly Data Upload</span>
+            <button onClick={() => setActiveTab('data_upload')} className={getItemClass('data_upload')}>
+              <div className="flex items-center space-x-3">
+                <UploadCloud className="w-4 h-4" />
+                <span>Monthly Data Upload</span>
+              </div>
+              {activeTab === 'data_upload' && <ChevronRight className="w-3.5 h-3.5" />}
             </button>
           )}
 
-          <button
-            onClick={() => setActiveTab('reports')}
-            className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-xs font-medium transition-all ${
-              activeTab === 'reports'
-                ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
-                : 'hover:bg-slate-800/60 text-slate-300'
-            }`}
-          >
-            <FileText className="w-4 h-4 text-blue-400" />
-            <span>Intelligence Reports</span>
+          <button onClick={() => setActiveTab('reports')} className={getItemClass('reports')}>
+            <div className="flex items-center space-x-3">
+              <FileText className="w-4 h-4" />
+              <span>Portfolio Reports</span>
+            </div>
+            {activeTab === 'reports' && <ChevronRight className="w-3.5 h-3.5" />}
           </button>
 
-          <button
-            onClick={() => setActiveTab('audit_trail')}
-            className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-xs font-medium transition-all ${
-              activeTab === 'audit_trail'
-                ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
-                : 'hover:bg-slate-800/60 text-slate-300'
-            }`}
-          >
-            <History className="w-4 h-4 text-slate-400" />
-            <span>Audit Trail</span>
+          <button onClick={() => setActiveTab('audit_trail')} className={getItemClass('audit_trail')}>
+            <div className="flex items-center space-x-3">
+              <History className="w-4 h-4" />
+              <span>Audit Trail</span>
+            </div>
+            {activeTab === 'audit_trail' && <ChevronRight className="w-3.5 h-3.5" />}
           </button>
         </div>
       </div>
 
-      {/* Bottom Footer Info */}
+      {/* Footer Info */}
       <div className="p-4 border-t border-slate-800 bg-slate-950/40 text-[11px] text-slate-400 space-y-1">
         <div className="flex items-center justify-between font-semibold text-slate-300">
-          <span>XGBoost + SHAP</span>
-          <span className="text-[10px] text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20">
+          <span>XGBoost + SHAP Engine</span>
+          <span className="text-[10px] font-bold text-lime-400 bg-lime-400/10 px-2 py-0.5 rounded border border-lime-400/20">
             Active
           </span>
         </div>
-        <p className="text-[10px]">Dataset: 18,363 rows | 1,709 Projects</p>
+        <p className="text-[10px]">1,709 Monitored Infrastructure Projects</p>
       </div>
     </aside>
   );

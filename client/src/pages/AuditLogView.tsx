@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { History, ShieldCheck, User } from 'lucide-react';
 import { api } from '../services/api';
 
 export const AuditLogView: React.FC = () => {
@@ -23,23 +22,20 @@ export const AuditLogView: React.FC = () => {
   };
 
   return (
-    <div className="p-6 space-y-6 max-w-7xl mx-auto">
-      <div className="flex items-center space-x-2 border-b border-slate-800 pb-4">
-        <History className="w-6 h-6 text-slate-400" />
-        <div>
-          <h1 className="text-2xl font-black text-slate-100">System Audit Trail</h1>
-          <p className="text-xs text-slate-400">Security & operational audit log tracking state-changing actions across roles.</p>
-        </div>
+    <div className="p-6 space-y-8 max-w-7xl mx-auto">
+      <div className="border-b border-slate-200/80 pb-5">
+        <h1 className="text-2xl font-black text-slate-900 tracking-tight">System Audit Trail</h1>
+        <p className="text-xs text-slate-500 mt-1">Security & operational audit log tracking state-changing actions across roles.</p>
       </div>
 
       {loading ? (
         <div className="p-8 flex items-center justify-center min-h-[40vh]">
-          <div className="w-10 h-10 border-4 border-slate-500/20 border-t-slate-500 rounded-full animate-spin" />
+          <div className="w-10 h-10 border-4 border-slate-200 border-t-lime-500 rounded-full animate-spin" />
         </div>
       ) : (
-        <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 shadow-xl overflow-x-auto">
-          <table className="w-full text-left text-xs text-slate-300">
-            <thead className="bg-slate-950/60 text-slate-400 uppercase font-semibold border-b border-slate-800">
+        <div className="p-6 rounded-2xl bg-white border border-slate-200/80 shadow-xs overflow-x-auto">
+          <table className="w-full text-left text-xs text-slate-700">
+            <thead className="bg-slate-50 text-slate-500 uppercase font-bold text-[10px] border-b border-slate-200">
               <tr>
                 <th className="p-3">Timestamp</th>
                 <th className="p-3">User</th>
@@ -48,14 +44,14 @@ export const AuditLogView: React.FC = () => {
                 <th className="p-3">Metadata</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800/60 font-mono">
+            <tbody className="divide-y divide-slate-100 font-mono">
               {logs && logs.map((l: any) => (
-                <tr key={l.id} className="hover:bg-slate-800/40 transition-colors">
-                  <td className="p-3 text-slate-500">{new Date(l.createdAt).toLocaleString()}</td>
-                  <td className="p-3 font-semibold text-slate-200">{l.user?.name || l.userId}</td>
-                  <td className="p-3 text-indigo-400 font-bold">{l.action}</td>
-                  <td className="p-3 text-slate-300">{l.entity}</td>
-                  <td className="p-3 text-[11px] text-slate-400 max-w-xs truncate">{l.metadataJson || '-'}</td>
+                <tr key={l.id} className="hover:bg-slate-50/80 transition-colors">
+                  <td className="p-3 text-slate-400">{new Date(l.createdAt).toLocaleString()}</td>
+                  <td className="p-3 font-semibold text-slate-900">{l.user?.name || l.userId}</td>
+                  <td className="p-3 font-bold text-slate-800">{l.action}</td>
+                  <td className="p-3 text-slate-600">{l.entity}</td>
+                  <td className="p-3 text-[11px] text-slate-500 max-w-xs truncate">{l.metadataJson || '-'}</td>
                 </tr>
               ))}
             </tbody>

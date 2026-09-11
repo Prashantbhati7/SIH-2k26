@@ -168,13 +168,19 @@ class ModelEngine:
         self.cost_encoder = encoder
         self.cost_metrics = {
             "version": "CUF-XGB-COST-v1",
+            "name": "Cost Overrun Model",
+            "type": "XGBClassifier Multiclass (multi:softprob)",
             "rows": len(data),
             "projects": int(data["project_code"].nunique()),
             "baseline_accuracy": round(float(baseline_acc), 4),
+            "baselineAccuracy": round(float(baseline_acc), 4),
             "model_accuracy": round(float(acc), 4),
+            "modelAccuracy": round(float(acc), 4),
             "macro_f1": round(float(macro_f1), 4),
+            "macroF1": round(float(macro_f1), 4),
             "class_metrics": report,
-            "classes": [str(c) for c in encoder.classes_]
+            "classes": [str(c) for c in encoder.classes_],
+            "limitationNote": "Weak recall (0.17) on Minor overrun class due to target imbalance."
         }
 
     def _train_delay_model(self):
@@ -218,11 +224,16 @@ class ModelEngine:
         self.delay_encoder = encoder
         self.delay_metrics = {
             "version": "CUF-XGB-DELAY-v1",
+            "name": "Future Delay Model",
+            "type": "XGBClassifier Multiclass (multi:softprob)",
             "rows": len(data),
             "projects": int(data["project_code"].nunique()),
             "baseline_accuracy": round(float(baseline_acc), 4),
+            "baselineAccuracy": round(float(baseline_acc), 4),
             "model_accuracy": round(float(acc), 4),
+            "modelAccuracy": round(float(acc), 4),
             "macro_f1": round(float(macro_f1), 4),
+            "macroF1": round(float(macro_f1), 4),
             "class_metrics": report,
             "classes": [str(c) for c in encoder.classes_]
         }
@@ -264,13 +275,19 @@ class ModelEngine:
         self.risk_model = model
         self.risk_metrics = {
             "version": "CUF-XGB-RISK-v1",
+            "name": "Future Risk Model",
+            "type": "XGBClassifier Binary (binary:logistic)",
             "rows": len(data),
             "projects": int(data["project_code"].nunique()),
             "baseline_accuracy": round(float(baseline_acc), 4),
+            "baselineAccuracy": round(float(baseline_acc), 4),
             "model_accuracy": round(float(acc), 4),
+            "modelAccuracy": round(float(acc), 4),
             "macro_f1": round(float(macro_f1), 4),
+            "macroF1": round(float(macro_f1), 4),
             "class_metrics": report,
-            "classes": ["Low Risk", "High Risk"]
+            "classes": ["Low Risk", "High Risk"],
+            "limitationNote": "High Risk recall is 0.50. Operates as a screening risk indicator."
         }
 
     def extract_shap_drivers(self, model, X_row, top_n=5):

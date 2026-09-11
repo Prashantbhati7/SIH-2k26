@@ -130,7 +130,7 @@ export function App() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans">
+    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans">
       <Navbar
         user={user}
         onLogout={handleLogout}
@@ -146,7 +146,7 @@ export function App() {
           onSelectProject={handleSelectProject}
         />
 
-        <main className="flex-1 overflow-y-auto bg-slate-950 pb-12">
+        <main className="flex-1 overflow-y-auto bg-slate-50 pb-16">
           {renderActiveView()}
         </main>
       </div>
