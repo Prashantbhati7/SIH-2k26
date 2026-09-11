@@ -1,0 +1,263 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Role {
+  id          String   @id @default(uuid())
+  code        String   @unique // MINISTER_POLICYMAKER, PROJECT_MANAGER, FIELD_OFFICER, CONTRACTOR
+  displayName String
+  users       User[]
+}
+
+model Ministry {
+  id       String    @id @default(uuid())
+  name     String    @unique
+  projects Project[]
+  users    User[]
+}
+
+model User {
+  id            String         @id @default(uuid())
+  name          String
+  email         String         @unique
+  passwordHash  String
+  roleId        String
+  role          Role           @relation(fields: [roleId], references: [id])
+  ministryId    String?
+  ministry      Ministry?      @relation(fields: [ministryId], references: [id])
+  agencyId      String?
+  active        Boolean        @default(true)
+  createdAt     DateTime       @default(now())
+  interventions Intervention[] @relation("AssignedInterventions")
+  fieldUpdates  FieldUpdate[]
+  tasks         ContractorTask[]
+  targets       MonthlyTarget[]
+  auditLogs     AuditLog[]
+}
+
+model Project {
+  id          String            @id @default(uuid())
+  projectCode Int               @unique
+  projectId   String
+  projectName String
+  ministryId  String?
+  ministry    Ministry?         @relation(fields: [ministryId], references: [id])
+  sector      String
+  state       String
+  agency      String
+  status      String            @default("ACTIVE")
+  latitude    Float?
+  longitude   Float?
+  source      String            @default("PAIMANA_CUF")
+  createdAt   DateTime          @default(now())
+
+  snapshots     ProjectSnapshot[]
+  predictions   RiskPrediction[]
+  warnings      EarlyWarning[]
+  interventions Intervention[]
+  fieldUpdates  FieldUpdate[]
+  tasks         ContractorTask[]
+  targets       MonthlyTarget[]
+  milestones    Milestone[]
+}
+
+model ProjectSnapshot {
+  id                          String           @id @default(uuid())
+  projectId                   String
+  project                     Project          @relation(fields: [projectId], references: [id])
+  reportDate                  String
+  originalCost                Float
+  revisedCost                 Float
+  cumulativeExpenditure       Float
+  physicalProgress            Float
+  expenditurePercentOriginal  Float
+  projectAgeMonths            Float
+  remainingPlannedDuration    Float
+  plannedDuration             Float
+  notStartedFlag              Float
+  genuineOverdueFlag          Float
+  ministryEncoded             Float
+  sectorEncoded               Float
+  stateEncoded                Float
+  costOverrunPercent          Float?
+  delayMonths                 Float?
+  createdAt                   DateTime         @default(now())
+
+  predictions                 RiskPrediction[]
+}
+
+model RiskPrediction {
+  id                    String          @id @default(uuid())
+  projectId             String
+  project               Project         @relation(fields: [projectId], references: [id])
+  snapshotId            String
+  snapshot              ProjectSnapshot @relation(fields: [snapshotId], references: [id])
+  modelVersion          String          @default("CUF-XGB-v1")
+  costPrediction        String
+  costProbabilitiesJson String
+  delayPrediction       String
+  delayProbabilitiesJson String
+  riskProbability       Float
+  riskLevel             String          // Low, Medium, High
+  scorePercentage       Float
+  createdAt             DateTime        @default(now())
+
+  drivers               RiskDriver[]
+  warnings              EarlyWarning[]
+}
+
+model RiskDriver {
+  id            String         @id @default(uuid())
+  predictionId  String
+  prediction    RiskPrediction @relation(fields: [predictionId], references: [id])
+  modelType     String         // RISK, COST, DELAY
+  feature       String
+  featureValue  Float
+  shapValue     Float
+  absShapValue  Float
+  rank          Int
+  direction     String         // increasing risk, reducing risk
+  explanation   String
+  prescription  String
+}
+
+model EarlyWarning {
+  id            String         @id @default(uuid())
+  projectId     String
+  project       Project        @relation(fields: [projectId], references: [id])
+  predictionId  String?
+  prediction    RiskPrediction? @relation(fields: [predictionId], references: [id])
+  category      String
+  severity      String         // CRITICAL, HIGH, MEDIUM, LOW
+  title         String
+  message       String
+  basis         String
+  status        String         @default("DETECTED") // DETECTED, ACKNOWLEDGED, ACTION_ASSIGNED, IN_PROGRESS, VERIFICATION_REQUIRED, RESOLVED, ESCALATED
+  detectedAt    DateTime       @default(now())
+
+  interventions Intervention[]
+}
+
+model Intervention {
+  id             String        @id @default(uuid())
+  projectId      String
+  project        Project       @relation(fields: [projectId], references: [id])
+  warningId      String?
+  warning        EarlyWarning? @relation(fields: [warningId], references: [id])
+  driver         String
+  recommendation String
+  priority       String        @default("HIGH") // HIGH, MEDIUM, LOW
+  assignedRole   String?
+  assignedUserId String?
+  assignedUser   User?         @relation("AssignedInterventions", fields: [assignedUserId], references: [id])
+  deadline       String?
+  status         String        @default("PENDING") // PENDING, IN_PROGRESS, VERIFIED, RESOLVED, ESCALATED
+  remarks        String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+}
+
+model FieldUpdate {
+  id                 String   @id @default(uuid())
+  projectId          String
+  project            Project  @relation(fields: [projectId], references: [id])
+  fieldOfficerId     String
+  fieldOfficer       User     @relation(fields: [fieldOfficerId], references: [id])
+  updateDate         String
+  physicalProgress   Float
+  milestoneStatus    String
+  issueType          String?
+  issueDescription   String?
+  evidenceUrl        String?
+  remarks            String?
+  verificationStatus String   @default("VERIFIED") // PENDING, VERIFIED, REJECTED
+  createdAt          DateTime @default(now())
+}
+
+model ContractorTask {
+  id           String   @id @default(uuid())
+  projectId    String
+  project      Project  @relation(fields: [projectId], references: [id])
+  contractorId String
+  contractor   User     @relation(fields: [contractorId], references: [id])
+  task         String
+  target       Float
+  completed    Float
+  deadline     String
+  status       String   @default("IN_PROGRESS") // PENDING, IN_PROGRESS, COMPLETED, OVERDUE
+  remarks      String?
+  createdAt    DateTime @default(now())
+}
+
+model MonthlyTarget {
+  id           String   @id @default(uuid())
+  projectId    String
+  project      Project  @relation(fields: [projectId], references: [id])
+  contractorId String
+  contractor   User     @relation(fields: [contractorId], references: [id])
+  month        String
+  target       Float
+  achieved     Float
+  createdAt    DateTime @default(now())
+}
+
+model Milestone {
+  id          String   @id @default(uuid())
+  projectId   String
+  project     Project  @relation(fields: [projectId], references: [id])
+  name        String
+  plannedDate String
+  actualDate  String?
+  status      String   @default("IN_PROGRESS") // NOT_STARTED, IN_PROGRESS, COMPLETED, DELAYED
+  createdAt   DateTime @default(now())
+}
+
+model DataUpload {
+  id              String                @id @default(uuid())
+  uploadedBy      String
+  filename        String
+  rowsReceived    Int
+  rowsValid       Int
+  rowsInvalid     Int
+  projectsUpdated Int
+  risksDetected   Int
+  status          String                @default("COMPLETED")
+  createdAt       DateTime              @default(now())
+  errors          DataValidationError[]
+}
+
+model DataValidationError {
+  id        String     @id @default(uuid())
+  uploadId  String
+  upload    DataUpload @relation(fields: [uploadId], references: [id])
+  rowNumber Int
+  field     String
+  errorType String
+  message   String
+}
+
+model ModelVersion {
+  id              String   @id @default(uuid())
+  name            String
+  type            String   // COST, DELAY, RISK
+  version         String   @unique
+  metricsJson     String
+  featureListJson String
+  createdAt       DateTime @default(now())
+}
+
+model AuditLog {
+  id           String   @id @default(uuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id])
+  action       String
+  entity       String
+  entityId     String?
+  metadataJson String?
+  createdAt    DateTime @default(now())
+}
