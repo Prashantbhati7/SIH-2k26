@@ -66,8 +66,8 @@ export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
         {/* Header */}
         <div className="p-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
           <div className="flex items-center space-x-2.5">
-            <div className="w-8 h-8 rounded-xl bg-slate-900 text-lime-400 flex items-center justify-center font-bold">
-              <Sparkles className="w-4 h-4" />
+            <div className="w-8 h-8 rounded-xl bg-slate-900 p-1.5 flex items-center justify-center font-bold">
+              <img src="/logo-white.png" alt="VikasDrishti Logo" className="w-full h-full object-contain" />
             </div>
             <div>
               <h3 className="font-bold text-sm text-slate-900">Portfolio Insights Assistant</h3>

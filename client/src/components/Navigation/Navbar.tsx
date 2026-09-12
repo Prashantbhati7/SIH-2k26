@@ -26,8 +26,8 @@ export const Navbar: React.FC<NavbarProps> = ({
     <header className="h-16 bg-white border-b border-slate-200 text-slate-900 px-6 flex items-center justify-between sticky top-0 z-40 shadow-xs">
       {/* Brand & Platform Identity */}
       <div className="flex items-center space-x-3">
-        <div className="w-9 h-9 rounded-xl bg-slate-900 text-lime-400 flex items-center justify-center font-black text-base shadow-sm">
-          <Activity className="w-5 h-5 text-lime-400" />
+        <div className="w-9 h-9 rounded-xl bg-slate-900 p-1.5 flex items-center justify-center shadow-xs">
+          <img src="/logo-white.png" alt="VikasDrishti Logo" className="w-full h-full object-contain" />
         </div>
         <div>
           <div className="flex items-center space-x-2">

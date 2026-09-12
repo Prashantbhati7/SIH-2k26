@@ -41,8 +41,8 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess, presetEmai
       <div className="max-w-md w-full space-y-8 bg-white border border-slate-200/80 p-8 rounded-2xl shadow-xs">
         {/* Brand Header */}
         <div className="text-center space-y-2">
-          <div className="w-12 h-12 rounded-2xl bg-slate-900 text-lime-400 flex items-center justify-center font-black text-xl shadow-xs mx-auto">
-            <Activity className="w-6 h-6 text-lime-400" />
+          <div className="w-14 h-14 rounded-2xl bg-slate-900 p-2.5 flex items-center justify-center shadow-xs mx-auto">
+            <img src="/logo-white.png" alt="VikasDrishti Logo" className="w-full h-full object-contain" />
           </div>
           <h2 className="text-2xl font-black tracking-tight text-slate-900">
             VikasDrishti Sign In
