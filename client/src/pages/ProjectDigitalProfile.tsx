@@ -38,11 +38,18 @@ export const ProjectDigitalProfile: React.FC<ProjectDigitalProfileProps> = ({
   // Tab State
   const [activeTab, setActiveTab] = useState<'OVERVIEW' | 'ENRICHMENT' | 'WHAT_IF'>(initialTab);
 
+  const isPolicyUser = userRole === 'MINISTER_POLICYMAKER' || userRole === 'PROJECT_MANAGER';
+
   useEffect(() => {
     if (initialTab) {
-      setActiveTab(initialTab);
+      if (!isPolicyUser && initialTab === 'WHAT_IF') {
+        setActiveTab('OVERVIEW');
+      } else {
+        setActiveTab(initialTab);
+      }
     }
-  }, [initialTab]);
+  }, [initialTab, isPolicyUser]);
+
   const [recommendations, setRecommendations] = useState<any[]>([]);
   const [coverageData, setCoverageData] = useState<any>(null);
   const [selectedRecDrawer, setSelectedRecDrawer] = useState<any>(null);
@@ -247,15 +254,17 @@ export const ProjectDigitalProfile: React.FC<ProjectDigitalProfileProps> = ({
             </span>
           )}
         </button>
-        <button
-          onClick={() => setActiveTab('WHAT_IF')}
-          className={`pb-3 transition-colors relative flex items-center space-x-2 ${
-            activeTab === 'WHAT_IF' ? 'text-indigo-600 border-b-2 border-indigo-600' : 'text-slate-500 hover:text-slate-700'
-          }`}
-        >
-          <Sliders className="w-4 h-4 text-indigo-600" />
-          <span>What-If Simulator</span>
-        </button>
+        {isPolicyUser && (
+          <button
+            onClick={() => setActiveTab('WHAT_IF')}
+            className={`pb-3 transition-colors relative flex items-center space-x-2 ${
+              activeTab === 'WHAT_IF' ? 'text-indigo-600 border-b-2 border-indigo-600' : 'text-slate-500 hover:text-slate-700'
+            }`}
+          >
+            <Sliders className="w-4 h-4 text-indigo-600" />
+            <span>What-If Simulator</span>
+          </button>
+        )}
       </div>
 
       {activeTab === 'ENRICHMENT' ? (

@@ -18,15 +18,17 @@ import { AIAssistantModal } from './components/AIAssistantModal';
 import { ReportsView } from './pages/ReportsView';
 import { AuditLogView } from './pages/AuditLogView';
 import { EnrichmentCenter } from './pages/EnrichmentCenter';
+import { FeatureLauncherHome } from './pages/FeatureLauncherHome';
 import { api } from './services/api';
 
 export function App() {
   const [viewState, setViewState] = useState<'landing' | 'login' | 'platform'>('landing');
   const [user, setUser] = useState<any>(null);
-  const [activeTab, setActiveTab] = useState<string>('dashboard');
+  const [activeTab, setActiveTab] = useState<string>('home');
   const [selectedProjectCode, setSelectedProjectCode] = useState<number>(40001);
   const [isAssistantOpen, setIsAssistantOpen] = useState<boolean>(false);
   const [loginPresetEmail, setLoginPresetEmail] = useState<string>('');
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(false);
 
   useEffect(() => {
     // Check stored user & token
@@ -47,7 +49,7 @@ export function App() {
   const handleLoginSuccess = (userData: any, token: string) => {
     setUser(userData);
     setViewState('platform');
-    setActiveTab('dashboard');
+    setActiveTab('home');
   };
 
   const handleLogout = () => {
@@ -72,6 +74,16 @@ export function App() {
     const roleCode = user?.roleCode || 'MINISTER_POLICYMAKER';
 
     switch (activeTab) {
+      case 'home':
+        return (
+          <FeatureLauncherHome
+            user={user}
+            setActiveTab={setActiveTab}
+            onSelectProject={handleSelectProject}
+            onOpenAssistant={() => setIsAssistantOpen(true)}
+          />
+        );
+
       case 'dashboard':
         if (roleCode === 'MINISTER_POLICYMAKER') {
           return <PolicymakerDashboard onSelectProject={handleSelectProject} onOpenAssistant={() => setIsAssistantOpen(true)} />;
@@ -131,7 +143,14 @@ export function App() {
         return <EnrichmentCenter />;
 
       default:
-        return <PolicymakerDashboard onSelectProject={handleSelectProject} onOpenAssistant={() => setIsAssistantOpen(true)} />;
+        return (
+          <FeatureLauncherHome
+            user={user}
+            setActiveTab={setActiveTab}
+            onSelectProject={handleSelectProject}
+            onOpenAssistant={() => setIsAssistantOpen(true)}
+          />
+        );
     }
   };
 
@@ -150,6 +169,8 @@ export function App() {
         onLogout={handleLogout}
         onOpenAssistant={() => setIsAssistantOpen(true)}
         activeRole={user?.roleDisplayName || 'Role View'}
+        isSidebarCollapsed={isSidebarCollapsed}
+        onToggleSidebar={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
       />
 
       <div className="flex-1 flex overflow-hidden">
@@ -158,6 +179,9 @@ export function App() {
           setActiveTab={setActiveTab}
           userRole={user?.roleCode || 'MINISTER_POLICYMAKER'}
           onSelectProject={handleSelectProject}
+          onOpenAssistant={() => setIsAssistantOpen(true)}
+          isCollapsed={isSidebarCollapsed}
+          setIsCollapsed={setIsSidebarCollapsed}
         />
 
         <main className="flex-1 overflow-y-auto bg-slate-50 pb-16">
