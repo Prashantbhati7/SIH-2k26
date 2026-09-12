@@ -20,8 +20,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterPlatform, onQui
       {/* Header Bar */}
       <header className="h-20 border-b border-slate-200/80 bg-white px-8 flex items-center justify-between max-w-7xl mx-auto w-full shadow-xs">
         <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 rounded-xl bg-slate-900 text-lime-400 flex items-center justify-center font-black text-lg shadow-sm">
-            <Activity className="w-5 h-5 text-lime-400" />
+          <div className="w-10 h-10 rounded-xl bg-slate-900 p-2 flex items-center justify-center shadow-sm">
+            <img src="/logo-white.png" alt="VikasDrishti Logo" className="w-full h-full object-contain" />
           </div>
           <div>
             <span className="font-black text-xl tracking-tight text-slate-900">

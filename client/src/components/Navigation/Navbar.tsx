@@ -4,9 +4,8 @@ import {
   LogOut, 
   Sparkles, 
   Building2, 
-  Activity,
   Bell,
-  HelpCircle
+  Menu
 } from 'lucide-react';
 
 interface NavbarProps {
@@ -14,29 +13,45 @@ interface NavbarProps {
   onLogout: () => void;
   onOpenAssistant: () => void;
   activeRole: string;
+  isSidebarCollapsed?: boolean;
+  onToggleSidebar?: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
   user,
   onLogout,
   onOpenAssistant,
-  activeRole
+  activeRole,
+  isSidebarCollapsed,
+  onToggleSidebar
 }) => {
   return (
     <header className="h-16 bg-white border-b border-slate-200 text-slate-900 px-6 flex items-center justify-between sticky top-0 z-40 shadow-xs">
-      {/* Brand & Platform Identity */}
+      {/* Brand & Sidebar Toggle */}
       <div className="flex items-center space-x-3">
-        <div className="w-9 h-9 rounded-xl bg-slate-900 text-lime-400 flex items-center justify-center font-black text-base shadow-sm">
-          <Activity className="w-5 h-5 text-lime-400" />
-        </div>
-        <div>
-          <div className="flex items-center space-x-2">
-            <span className="font-black text-lg tracking-tight text-slate-900">
-              VikasDrishti
-            </span>
-            <span className="text-[10px] font-bold tracking-wide px-2 py-0.5 rounded-full bg-lime-100 text-lime-800 border border-lime-200">
-              MoSPI Platform
-            </span>
+        {onToggleSidebar && (
+          <button
+            onClick={onToggleSidebar}
+            className="p-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors"
+            title={isSidebarCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
+          >
+            <Menu className="w-5 h-5 text-slate-700" />
+          </button>
+        )}
+
+        <div className="flex items-center space-x-3">
+          <div className="w-9 h-9 rounded-xl bg-slate-900 p-1.5 flex items-center justify-center shadow-xs">
+            <img src="/logo-white.png" alt="VikasDrishti Logo" className="w-full h-full object-contain" />
+          </div>
+          <div>
+            <div className="flex items-center space-x-2">
+              <span className="font-black text-lg tracking-tight text-slate-900">
+                VikasDrishti
+              </span>
+              <span className="text-[10px] font-bold tracking-wide px-2 py-0.5 rounded-full bg-lime-100 text-lime-800 border border-lime-200">
+                MoSPI Platform
+              </span>
+            </div>
           </div>
         </div>
       </div>
