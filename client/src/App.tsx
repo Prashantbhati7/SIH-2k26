@@ -17,6 +17,7 @@ import { ModelLab } from './pages/ModelLab';
 import { AIAssistantModal } from './components/AIAssistantModal';
 import { ReportsView } from './pages/ReportsView';
 import { AuditLogView } from './pages/AuditLogView';
+import { EnrichmentCenter } from './pages/EnrichmentCenter';
 import { api } from './services/api';
 
 export function App() {
@@ -92,6 +93,16 @@ export function App() {
           />
         );
 
+      case 'what_if':
+        return (
+          <ProjectDigitalProfile
+            projectCode={selectedProjectCode}
+            userRole={roleCode}
+            onOpenAssistant={() => setIsAssistantOpen(true)}
+            initialTab="WHAT_IF"
+          />
+        );
+
       case 'warnings':
         return <EarlyWarningCenter onSelectProject={handleSelectProject} />;
 
@@ -115,6 +126,9 @@ export function App() {
 
       case 'audit_trail':
         return <AuditLogView />;
+
+      case 'enrichment':
+        return <EnrichmentCenter />;
 
       default:
         return <PolicymakerDashboard onSelectProject={handleSelectProject} onOpenAssistant={() => setIsAssistantOpen(true)} />;

@@ -158,6 +158,30 @@ export const PolicymakerDashboard: React.FC<PolicymakerDashboardProps> = ({
         </div>
       </div>
 
+      {/* Portfolio Enrichment Readiness Card */}
+      <div className="p-6 rounded-2xl bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white shadow-md flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+        <div className="space-y-1.5 max-w-3xl">
+          <div className="flex items-center space-x-2 text-lime-400 font-bold text-xs uppercase tracking-wider">
+            <Sparkles className="w-4 h-4" />
+            <span>Progressive Portfolio Enrichment</span>
+          </div>
+          <h3 className="text-lg font-black text-white">Project-Specific Execution Signal Collection</h3>
+          <p className="text-xs text-slate-300 leading-relaxed">
+            14 high-risk projects are currently collecting additional execution signals (milestone slippage, site stoppage days, payment pending days) to build a longitudinal dataset for future pilot model evaluation.
+          </p>
+        </div>
+
+        <div className="flex items-center space-x-4 shrink-0 bg-slate-800/80 p-4 rounded-xl border border-slate-700">
+          <div>
+            <span className="text-[11px] text-slate-400 block font-semibold">Accumulated Dataset</span>
+            <span className="text-lg font-black text-white">0 / 3 Months</span>
+          </div>
+          <span className="px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-bold font-mono">
+            EVALUATION LOCKED
+          </span>
+        </div>
+      </div>
+
       {/* Prominent Priority Actions Section */}
       <div className="p-6 rounded-2xl bg-white border border-slate-200/80 shadow-xs space-y-5">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-4">

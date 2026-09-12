@@ -15,6 +15,8 @@ import benchmarkRoutes from './routes/benchmark';
 import reportRoutes from './routes/reports';
 import modelRoutes from './routes/models';
 import auditRoutes from './routes/audit';
+import enrichmentRoutes from './routes/enrichment';
+import whatifRoutes from './routes/whatif';
 
 dotenv.config();
 
@@ -37,6 +39,8 @@ app.get('/health', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/projects', projectRoutes);
+app.use('/api/projects', enrichmentRoutes);
+app.use('/api/projects', whatifRoutes);
 app.use('/api/predictions', predictionRoutes);
 app.use('/api/warnings', warningRoutes);
 app.use('/api/interventions', interventionRoutes);
@@ -48,6 +52,7 @@ app.use('/api/benchmark', benchmarkRoutes);
 app.use('/api/reports', reportRoutes);
 app.use('/api/models', modelRoutes);
 app.use('/api/audit', auditRoutes);
+app.use('/api/enrichment', enrichmentRoutes);
 
 app.listen(PORT, () => {
   console.log(`==================================================`);

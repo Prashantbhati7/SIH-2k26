@@ -130,6 +130,40 @@ export const ModelLab: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Enrichment Progress & Evaluation Gate Card */}
+      <div className="p-6 rounded-2xl bg-white border border-slate-200/80 space-y-5 shadow-xs">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+          <div>
+            <h2 className="text-base font-bold text-slate-900 flex items-center space-x-2">
+              <Cpu className="w-5 h-5 text-slate-800" />
+              <span>Progressive Enrichment Model Evaluation Gate</span>
+            </h2>
+            <p className="text-xs text-slate-500 mt-0.5">Controlled offline comparison between Baseline CUF-only vs CUF+Enriched pilot model.</p>
+          </div>
+          <span className="px-3 py-1 rounded-full bg-slate-900 text-amber-400 font-mono text-xs font-bold shrink-0">
+            GATE STATUS: COLLECTION IN PROGRESS
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+          <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-1">
+            <span className="font-bold text-slate-500 block">Baseline Model (Active)</span>
+            <span className="text-sm font-black text-slate-900 block">CUF-XGB-v1 (13 Features)</span>
+            <p className="text-slate-600">Currently serving production risk predictions across all 120+ projects.</p>
+          </div>
+          <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-1">
+            <span className="font-bold text-slate-500 block">Candidate Pilot Model</span>
+            <span className="text-sm font-black text-slate-900 block">CUF-ENRICHED-XGB-v1-PILOT</span>
+            <p className="text-slate-600">Integrates 3 enriched signals (Milestone Slippage, Site Stoppage, Progress Velocity).</p>
+          </div>
+          <div className="p-4 rounded-xl bg-amber-50/70 border border-amber-200 text-amber-900 space-y-1">
+            <span className="font-bold block">Evaluation Readiness Gate</span>
+            <span className="font-black text-sm block">Locked (0 / 24 Verified Observations)</span>
+            <p className="text-amber-800">Requires 3-4 months of validated longitudinal observations before running offline pilot comparison.</p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

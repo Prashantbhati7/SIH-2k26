@@ -1,0 +1,33 @@
+{
+  "name": "VikasDrishti Enrichment Intelligence Upgrade",
+  "mode": "additive-change-request",
+  "preserve_existing_system": true,
+  "source_of_truth": [
+    "current_repository",
+    "source-final.ipynb"
+  ],
+  "new_capability": "Project-specific enrichment feature recommendation and controlled data collection",
+  "current_model_unchanged": true,
+  "core_flow": [
+    "current_prediction",
+    "SHAP_explanation",
+    "project_specific_feature_recommendation",
+    "manager_selection",
+    "field_contractor_collection",
+    "verification",
+    "coverage_tracking",
+    "CUF_vs_enriched_evaluation",
+    "versioned_future_model"
+  ],
+  "evaluation_gate": {
+    "automatic_retraining": false,
+    "minimum_collection_period_default": "3-4 months",
+    "note": "Engineering readiness gate, not a universal statistical sufficiency claim"
+  },
+  "roles": [
+    "minister/policymaker",
+    "project_manager",
+    "field_officer",
+    "contractor"
+  ]
+}

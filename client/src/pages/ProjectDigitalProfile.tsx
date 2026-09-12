@@ -12,24 +12,41 @@ import {
   UserCheck, 
   ShieldAlert,
   Activity,
-  Plus
+  Plus,
+  Sliders
 } from 'lucide-react';
 import { api } from '../services/api';
+import { WhatIfSimulator } from '../components/WhatIfSimulator';
 
 interface ProjectDigitalProfileProps {
   projectCode: number;
   userRole: string;
   onOpenAssistant: () => void;
+  initialTab?: 'OVERVIEW' | 'ENRICHMENT' | 'WHAT_IF';
 }
 
 export const ProjectDigitalProfile: React.FC<ProjectDigitalProfileProps> = ({
   projectCode,
   userRole,
-  onOpenAssistant
+  onOpenAssistant,
+  initialTab = 'OVERVIEW'
 }) => {
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Tab State
+  const [activeTab, setActiveTab] = useState<'OVERVIEW' | 'ENRICHMENT' | 'WHAT_IF'>(initialTab);
+
+  useEffect(() => {
+    if (initialTab) {
+      setActiveTab(initialTab);
+    }
+  }, [initialTab]);
+  const [recommendations, setRecommendations] = useState<any[]>([]);
+  const [coverageData, setCoverageData] = useState<any>(null);
+  const [selectedRecDrawer, setSelectedRecDrawer] = useState<any>(null);
+  const [loadingEnrichment, setLoadingEnrichment] = useState<boolean>(false);
 
   // Intervention Assignment Modal State
   const [showInterventionModal, setShowInterventionModal] = useState<boolean>(false);
@@ -46,7 +63,33 @@ export const ProjectDigitalProfile: React.FC<ProjectDigitalProfileProps> = ({
 
   useEffect(() => {
     fetchProjectProfile();
+    fetchEnrichmentData();
   }, [projectCode]);
+
+  const fetchEnrichmentData = async () => {
+    try {
+      setLoadingEnrichment(true);
+      const [recRes, covRes] = await Promise.all([
+        api.get(`/projects/${projectCode}/enrichment/recommendations`),
+        api.get(`/projects/${projectCode}/enrichment/coverage`)
+      ]);
+      setRecommendations(recRes.data.recommendations || []);
+      setCoverageData(covRes.data);
+    } catch (err) {
+      console.error('Fetch enrichment error:', err);
+    } finally {
+      setLoadingEnrichment(false);
+    }
+  };
+
+  const handleUpdateRecommendation = async (recId: string, status: string, selected: boolean) => {
+    try {
+      await api.patch(`/enrichment/recommendations/${recId}`, { status, selected });
+      fetchEnrichmentData();
+    } catch (err: any) {
+      alert('Failed to update recommendation: ' + (err?.response?.data?.error || err.message));
+    }
+  };
 
   const fetchProjectProfile = async () => {
     try {
@@ -179,7 +222,273 @@ export const ProjectDigitalProfile: React.FC<ProjectDigitalProfileProps> = ({
         </div>
       </div>
 
-      {/* 2. Latest Snapshot Operational Metrics */}
+      {/* Tab Navigation */}
+      <div className="flex border-b border-slate-200 space-x-6 text-sm font-bold">
+        <button
+          onClick={() => setActiveTab('OVERVIEW')}
+          className={`pb-3 transition-colors relative flex items-center space-x-2 ${
+            activeTab === 'OVERVIEW' ? 'text-slate-900 border-b-2 border-slate-900' : 'text-slate-500 hover:text-slate-700'
+          }`}
+        >
+          <Activity className="w-4 h-4" />
+          <span>Overview & Baseline Risk</span>
+        </button>
+        <button
+          onClick={() => setActiveTab('ENRICHMENT')}
+          className={`pb-3 transition-colors relative flex items-center space-x-2 ${
+            activeTab === 'ENRICHMENT' ? 'text-slate-900 border-b-2 border-slate-900' : 'text-slate-500 hover:text-slate-700'
+          }`}
+        >
+          <Sparkles className="w-4 h-4 text-lime-600" />
+          <span>Enrichment Intelligence</span>
+          {recommendations.length > 0 && (
+            <span className="px-2 py-0.5 rounded-full text-[10px] bg-lime-100 text-slate-900 font-black border border-lime-300">
+              {recommendations.length} Candidate Signals
+            </span>
+          )}
+        </button>
+        <button
+          onClick={() => setActiveTab('WHAT_IF')}
+          className={`pb-3 transition-colors relative flex items-center space-x-2 ${
+            activeTab === 'WHAT_IF' ? 'text-indigo-600 border-b-2 border-indigo-600' : 'text-slate-500 hover:text-slate-700'
+          }`}
+        >
+          <Sliders className="w-4 h-4 text-indigo-600" />
+          <span>What-If Simulator</span>
+        </button>
+      </div>
+
+      {activeTab === 'ENRICHMENT' ? (
+        <div className="space-y-8">
+          {/* Top Banner */}
+          <div className="p-6 rounded-2xl bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white space-y-3 shadow-md">
+            <div className="flex items-center space-x-2 text-lime-400 font-bold text-xs uppercase tracking-wider">
+              <Sparkles className="w-4 h-4" />
+              <span>Project-Specific Data Enrichment</span>
+            </div>
+            <h2 className="text-xl font-black text-white">Identify the Next Execution Signals Worth Collecting</h2>
+            <p className="text-xs text-slate-300 max-w-3xl leading-relaxed">
+              Based on this project's predictions and SHAP drivers, VikasDrishti has identified specific operational signals not currently captured in monthly CUF snapshots. Collecting these variables will accumulate a pilot dataset for future model evaluation.
+            </p>
+          </div>
+
+          {/* Section A: Why Are We Here? */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            <div className="p-5 rounded-2xl bg-white border border-slate-200/80 shadow-xs space-y-1.5">
+              <span className="text-xs font-semibold text-slate-500">Current Forecast Risk</span>
+              <div className="text-lg font-black text-rose-600">{prediction?.riskLevel || 'High'} ({prediction?.scorePercentage || 0}%)</div>
+              <p className="text-[11px] text-slate-500">Evaluated on baseline 13 CUF features</p>
+            </div>
+            <div className="p-5 rounded-2xl bg-white border border-slate-200/80 shadow-xs space-y-1.5">
+              <span className="text-xs font-semibold text-slate-500">Primary Risk Target</span>
+              <div className="text-lg font-black text-slate-900">{prediction?.delayPrediction || 'Severe Delay (>40 mo)'}</div>
+              <p className="text-[11px] text-slate-500">Schedule & progress execution focus</p>
+            </div>
+            <div className="p-5 rounded-2xl bg-white border border-slate-200/80 shadow-xs space-y-1.5">
+              <span className="text-xs font-semibold text-slate-500">Candidate Feature Status</span>
+              <div className="text-lg font-black text-amber-700">{recommendations.length} Recommended</div>
+              <p className="text-[11px] text-amber-700 font-semibold">Candidates for future evaluation</p>
+            </div>
+          </div>
+
+          {/* Section B: Anchored SHAP Drivers */}
+          <div className="p-6 rounded-2xl bg-white border border-slate-200/80 shadow-xs space-y-4">
+            <h3 className="font-bold text-base text-slate-900">1. Current Model Explainability (SHAP Drivers Anchor)</h3>
+            <p className="text-xs text-slate-500">Recommendation engine uses these active drivers to select candidate enriched variables:</p>
+            <div className="flex flex-wrap gap-2">
+              {prediction?.drivers && prediction.drivers.map((d: any) => (
+                <span key={d.rank} className="px-3 py-1.5 rounded-xl bg-slate-100 border border-slate-200 text-xs font-mono font-bold text-slate-800 flex items-center space-x-2">
+                  <span>#{d.rank} {d.feature}</span>
+                  <span className="text-slate-500">({d.absShapValue.toFixed(2)})</span>
+                </span>
+              ))}
+            </div>
+          </div>
+
+          {/* Section C: Recommended Features */}
+          <div className="p-6 rounded-2xl bg-white border border-slate-200/80 shadow-xs space-y-6">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+              <div>
+                <h3 className="text-base font-bold text-slate-900">2. Recommended Enriched Variables to Collect</h3>
+                <p className="text-xs text-slate-500 mt-0.5">Select variables to activate field & contractor data collection plans.</p>
+              </div>
+              <button
+                onClick={() => fetchEnrichmentData()}
+                className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-xs font-bold text-slate-700"
+              >
+                Refresh Engine
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              {recommendations.map((rec: any) => {
+                const catalog = rec.featureCatalog || {};
+                const isAccepted = rec.status === 'ACCEPTED' || rec.selected;
+                return (
+                  <div key={rec.id} className="p-5 rounded-2xl bg-slate-50/80 border border-slate-200/80 space-y-4 hover:bg-slate-50 transition-all">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                      <div className="space-y-1">
+                        <div className="flex items-center space-x-2">
+                          <span className="font-black text-sm text-slate-900">{catalog.featureName}</span>
+                          <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                            rec.priority === 'HIGH' ? 'bg-rose-100 text-rose-800 border border-rose-200' : 'bg-amber-100 text-amber-800 border border-amber-200'
+                          }`}>
+                            {rec.priority} Priority
+                          </span>
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-200 text-slate-800 border border-slate-300">
+                            {rec.status}
+                          </span>
+                        </div>
+                        <p className="text-xs text-slate-600">{catalog.description}</p>
+                      </div>
+
+                      <div className="flex items-center space-x-2 shrink-0">
+                        <button
+                          onClick={() => setSelectedRecDrawer(rec)}
+                          className="px-3 py-1.5 rounded-xl bg-white hover:bg-slate-100 text-slate-800 text-xs font-bold border border-slate-200"
+                        >
+                          View Details
+                        </button>
+                        {isAccepted ? (
+                          <span className="px-3.5 py-1.5 rounded-xl bg-emerald-100 text-emerald-800 text-xs font-bold border border-emerald-200 flex items-center space-x-1">
+                            <CheckCircle2 className="w-3.5 h-3.5" />
+                            <span>Collection Active</span>
+                          </span>
+                        ) : (
+                          <button
+                            onClick={() => handleUpdateRecommendation(rec.id, 'ACCEPTED', true)}
+                            className="px-3.5 py-1.5 rounded-xl bg-lime-400 hover:bg-lime-500 text-slate-950 text-xs font-bold transition-all shadow-xs"
+                          >
+                            Accept & Collect
+                          </button>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs pt-3 border-t border-slate-200/60 bg-white p-3 rounded-xl border border-slate-200">
+                      <div>
+                        <span className="font-bold text-slate-500 block text-[11px]">Why Recommended for this Project:</span>
+                        <p className="text-slate-800 font-medium">{rec.reason}</p>
+                      </div>
+                      <div>
+                        <span className="font-bold text-slate-500 block text-[11px]">Current Data Gap:</span>
+                        <p className="text-slate-700">{rec.currentDataGap}</p>
+                      </div>
+                      <div className="flex flex-col justify-between">
+                        <div>
+                          <span className="font-bold text-slate-500 block text-[11px]">Collection Role & Cadence:</span>
+                          <span className="font-bold text-slate-900">{catalog.collectionRole} • {catalog.cadence} ({catalog.unit})</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Section E: Collection Progress & Coverage */}
+          <div className="p-6 rounded-2xl bg-white border border-slate-200/80 shadow-xs space-y-4">
+            <h3 className="font-bold text-base text-slate-900">3. Project Data Collection Progress</h3>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="p-4 rounded-xl bg-slate-50 border border-slate-200">
+                <span className="text-xs text-slate-500 font-semibold block">Active Plans</span>
+                <span className="text-xl font-black text-slate-900">{coverageData?.summary?.activePlans || 0} Features</span>
+              </div>
+              <div className="p-4 rounded-xl bg-slate-50 border border-slate-200">
+                <span className="text-xs text-slate-500 font-semibold block">Total Observations</span>
+                <span className="text-xl font-black text-slate-900">{coverageData?.summary?.totalObservations || 0} Recorded</span>
+              </div>
+              <div className="p-4 rounded-xl bg-slate-50 border border-slate-200">
+                <span className="text-xs text-slate-500 font-semibold block">Coverage %</span>
+                <span className="text-xl font-black text-emerald-600">{coverageData?.summary?.averageCoveragePercent || 0}% Complete</span>
+              </div>
+              <div className="p-4 rounded-xl bg-slate-50 border border-slate-200">
+                <span className="text-xs text-slate-500 font-semibold block">Months Collected</span>
+                <span className="text-xl font-black text-slate-900">{coverageData?.summary?.monthsCollected || 0} / 3 Months</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Section F: Future Evaluation Gate Status */}
+          <div className="p-6 rounded-2xl bg-slate-900 text-white border border-slate-800 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="space-y-1">
+              <div className="flex items-center space-x-2 text-amber-400 font-bold text-xs">
+                <Clock className="w-4 h-4" />
+                <span>Future Model Evaluation Gate</span>
+              </div>
+              <h4 className="font-bold text-sm text-white">CUF Baseline Active • CUF+Enriched Pilot Evaluation Locked</h4>
+              <p className="text-xs text-slate-400 max-w-2xl">
+                Evaluation will become available in the Model Lab after 3-4 months of validated longitudinal observations are collected. Candidate features do NOT alter current predictions until evaluated.
+              </p>
+            </div>
+            <span className="px-3.5 py-1.5 rounded-full bg-slate-800 text-slate-300 font-mono text-xs font-bold border border-slate-700 shrink-0">
+              GATE STATUS: COLLECTION IN PROGRESS
+            </span>
+          </div>
+
+          {/* Feature Detail Drawer Modal */}
+          {selectedRecDrawer && (
+            <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+              <div className="bg-white border border-slate-200 rounded-2xl p-6 max-w-xl w-full space-y-4 shadow-2xl">
+                <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                  <h3 className="text-lg font-bold text-slate-900">Enriched Signal Specification</h3>
+                  <button onClick={() => setSelectedRecDrawer(null)} className="text-slate-400 hover:text-slate-600 font-bold text-sm">✕</button>
+                </div>
+
+                <div className="space-y-3 text-xs">
+                  <div className="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                    <span className="font-bold text-slate-900 block text-sm">{selectedRecDrawer.featureCatalog?.featureName}</span>
+                    <p className="text-slate-600 mt-1">{selectedRecDrawer.featureCatalog?.description}</p>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                      <span className="font-bold text-slate-500 block">Target Relevance</span>
+                      <span className="font-bold text-slate-900">{selectedRecDrawer.targetRelevance}</span>
+                    </div>
+                    <div className="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                      <span className="font-bold text-slate-500 block">Collection Role</span>
+                      <span className="font-bold text-slate-900">{selectedRecDrawer.featureCatalog?.collectionRole}</span>
+                    </div>
+                    <div className="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                      <span className="font-bold text-slate-500 block">Collection Cadence</span>
+                      <span className="font-bold text-slate-900">{selectedRecDrawer.featureCatalog?.cadence} ({selectedRecDrawer.featureCatalog?.unit})</span>
+                    </div>
+                    <div className="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                      <span className="font-bold text-slate-500 block">Input Type</span>
+                      <span className="font-bold text-slate-900">{selectedRecDrawer.featureCatalog?.inputType}</span>
+                    </div>
+                  </div>
+
+                  <div className="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                    <span className="font-bold text-slate-500 block">Why Recommended for this Project:</span>
+                    <p className="text-slate-800 mt-0.5 font-medium">{selectedRecDrawer.reason}</p>
+                  </div>
+
+                  <div className="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                    <span className="font-bold text-slate-500 block">Current Information Gap:</span>
+                    <p className="text-slate-700 mt-0.5">{selectedRecDrawer.currentDataGap}</p>
+                  </div>
+                </div>
+
+                <div className="flex justify-end pt-2">
+                  <button
+                    onClick={() => setSelectedRecDrawer(null)}
+                    className="px-4 py-2 rounded-xl text-xs font-bold text-slate-900 bg-slate-100 hover:bg-slate-200"
+                  >
+                    Close Specification
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      ) : activeTab === 'WHAT_IF' ? (
+        <WhatIfSimulator projectCode={projectCode} />
+      ) : (
+        <>
+          {/* 2. Latest Snapshot Operational Metrics */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-5">
         <div className="p-5 rounded-2xl bg-white border border-slate-200/80 shadow-xs space-y-1">
           <span className="text-xs font-semibold text-slate-500">Original Cost</span>
@@ -473,6 +782,8 @@ export const ProjectDigitalProfile: React.FC<ProjectDigitalProfileProps> = ({
           ))}
         </div>
       </div>
+      </>
+      )}
 
       {/* Intervention Modal */}
       {showInterventionModal && (

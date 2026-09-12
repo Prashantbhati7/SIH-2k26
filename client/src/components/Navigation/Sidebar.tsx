@@ -12,7 +12,9 @@ import {
   History,
   UserCheck,
   HardHat,
-  ChevronRight
+  ChevronRight,
+  Sparkles,
+  Sliders
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -94,6 +96,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
             {activeTab === 'project_profile' && <ChevronRight className="w-3.5 h-3.5" />}
           </button>
 
+          <button
+            onClick={() => {
+              setActiveTab('what_if');
+            }}
+            className={getItemClass('what_if')}
+          >
+            <div className="flex items-center space-x-3">
+              <Sliders className="w-4 h-4 text-indigo-400" />
+              <span>What-If Simulator</span>
+            </div>
+            {activeTab === 'what_if' && <ChevronRight className="w-3.5 h-3.5" />}
+          </button>
+
           {(isMinister || isManager) && (
             <>
               <button onClick={() => setActiveTab('warnings')} className={getItemClass('warnings')}>
@@ -126,6 +141,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   <span>Sector Benchmarking</span>
                 </div>
                 {activeTab === 'benchmarking' && <ChevronRight className="w-3.5 h-3.5" />}
+              </button>
+
+              <button onClick={() => setActiveTab('enrichment')} className={getItemClass('enrichment')}>
+                <div className="flex items-center space-x-3">
+                  <Sparkles className="w-4 h-4 text-lime-400" />
+                  <span>Enrichment Center</span>
+                </div>
+                {activeTab === 'enrichment' && <ChevronRight className="w-3.5 h-3.5" />}
               </button>
             </>
           )}

@@ -224,7 +224,7 @@ export const FieldDashboard: React.FC<FieldDashboardProps> = ({ onSelectProject 
                     onClick={() => onSelectProject(p.projectCode)}
                     className="text-slate-800 hover:text-slate-950 font-bold flex items-center space-x-1"
                   >
-                    <span>View Profile</span>
+                    <span>View Profile & Signal Collection</span>
                     <ChevronRight className="w-3.5 h-3.5" />
                   </button>
                 </div>
