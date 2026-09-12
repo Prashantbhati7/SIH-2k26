@@ -19,6 +19,7 @@ import { ReportsView } from './pages/ReportsView';
 import { AuditLogView } from './pages/AuditLogView';
 import { EnrichmentCenter } from './pages/EnrichmentCenter';
 import { FeatureLauncherHome } from './pages/FeatureLauncherHome';
+import { ProjectsListView } from './pages/ProjectsListView';
 import { api } from './services/api';
 
 export function App() {
@@ -95,6 +96,9 @@ export function App() {
           return <ContractorDashboard onSelectProject={handleSelectProject} />;
         }
         return <PolicymakerDashboard onSelectProject={handleSelectProject} onOpenAssistant={() => setIsAssistantOpen(true)} />;
+
+      case 'projects_list':
+        return <ProjectsListView onSelectProject={handleSelectProject} />;
 
       case 'project_profile':
         return (

@@ -18,7 +18,8 @@ import {
   Sliders,
   PanelLeftClose,
   PanelLeftOpen,
-  Shield
+  Shield,
+  Building2
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -155,6 +156,18 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </button>
 
           <button
+            onClick={() => setActiveTab('projects_list')}
+            className={getItemClass('projects_list')}
+            title={isCollapsed ? "All Projects" : undefined}
+          >
+            <div className="flex items-center space-x-3">
+              <FolderKanban className="w-4 h-4 text-lime-400 shrink-0" />
+              {!isCollapsed && <span>All Projects</span>}
+            </div>
+            {!isCollapsed && activeTab === 'projects_list' && <ChevronRight className="w-3.5 h-3.5" />}
+          </button>
+
+          <button
             onClick={() => {
               setActiveTab('project_profile');
               onSelectProject(40001);
@@ -163,8 +176,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
             title={isCollapsed ? "Projects" : undefined}
           >
             <div className="flex items-center space-x-3">
-              <FolderKanban className="w-4 h-4 shrink-0" />
-              {!isCollapsed && <span>Projects</span>}
+              <Building2 className="w-4 h-4 shrink-0" />
+              {!isCollapsed && <span>Project Detail</span>}
             </div>
             {!isCollapsed && activeTab === 'project_profile' && <ChevronRight className="w-3.5 h-3.5" />}
           </button>

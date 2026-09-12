@@ -173,16 +173,25 @@ export const FeatureLauncherHome: React.FC<FeatureLauncherHomeProps> = ({
     // Default for Ministers & Project Managers (Policy & Oversight Roles)
     return [
       {
+        id: 'all_projects',
+        title: 'All Projects Directory',
+        description: 'Browse, search & filter all 1,709+ national infrastructure projects',
+        icon: Building2,
+        onClick: () => setActiveTab('projects_list'),
+        accentBg: 'bg-slate-900',
+        accentText: 'text-lime-400'
+      },
+      {
         id: 'projects',
-        title: 'Projects',
-        description: 'View and monitor infrastructure projects',
+        title: 'Project Detail',
+        description: 'View digital profile & snapshot metrics for selected project',
         icon: Building2,
         onClick: () => {
           onSelectProject(40001);
           setActiveTab('project_profile');
         },
         accentBg: 'bg-slate-900',
-        accentText: 'text-lime-400'
+        accentText: 'text-indigo-400'
       },
       {
         id: 'risks',
