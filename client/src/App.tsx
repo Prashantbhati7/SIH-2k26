@@ -20,6 +20,7 @@ import { AuditLogView } from './pages/AuditLogView';
 import { EnrichmentCenter } from './pages/EnrichmentCenter';
 import { FeatureLauncherHome } from './pages/FeatureLauncherHome';
 import { ProjectsListView } from './pages/ProjectsListView';
+import { ContractorPortfolioView } from './pages/ContractorPortfolioView';
 import { api } from './services/api';
 
 export function App() {
@@ -145,6 +146,14 @@ export function App() {
 
       case 'enrichment':
         return <EnrichmentCenter />;
+
+      case 'contractor_portfolio':
+        return (
+          <ContractorPortfolioView
+            onSelectProject={handleSelectProject}
+            userRole={roleCode}
+          />
+        );
 
       default:
         return (

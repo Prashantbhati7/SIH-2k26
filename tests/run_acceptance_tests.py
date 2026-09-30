@@ -2,12 +2,14 @@ import requests
 import json
 import sys
 
-BASE_URL = "http://localhost:5000/api"
-ML_URL = "http://localhost:8000"
+import os
+
+BASE_URL = os.environ.get("BASE_URL", "http://localhost:5001/api")
+ML_URL = os.environ.get("ML_URL", "http://localhost:8000")
 
 def test_acceptance_criteria():
     print("==================================================")
-    print("VIKASDRISHTI ACCEPTANCE TEST SUITE (docs/14-acceptance-tests.md)")
+    print("VIKASDRISHTI ACCEPTANCE TEST SUITE WITH CONTRACTOR PORTFOLIO & SAFETY ENGINE")
     print("==================================================\n")
 
     passed_count = 0
@@ -129,6 +131,81 @@ def test_acceptance_criteria():
         passed_count += 1
     except Exception as e:
         print(f"[FAIL] 9. Model Intelligence Lab: {e}")
+
+    # 8. Contractor Portfolio List & Statistics Test
+    total_tests += 1
+    contractor_list = []
+    try:
+        headers = {"Authorization": f"Bearer {tokens.get('MINISTER_POLICYMAKER')}"}
+        r = requests.get(f"{BASE_URL}/contractor-portfolio", headers=headers)
+        assert r.status_code == 200, f"Expected 200, got {r.status_code}"
+        contractor_list = r.json().get("contractors", [])
+        assert len(contractor_list) >= 5, f"Expected at least 5 contractors, found {len(contractor_list)}"
+
+        r_stats = requests.get(f"{BASE_URL}/contractor-portfolio/stats", headers=headers)
+        assert r_stats.status_code == 200
+        stats = r_stats.json()
+        assert stats.get("totalContractors") >= 5
+        assert "safeCount" in stats and "highRiskCount" in stats
+        print(f"[PASS] 10. Contractor Portfolio: Listed {len(contractor_list)} certified vendors with aggregated KPI stats")
+        passed_count += 1
+    except Exception as e:
+        print(f"[FAIL] 10. Contractor Portfolio List & Stats: {e}")
+
+    # 9. Contractor Dossier & Historical Records Test
+    total_tests += 1
+    try:
+        headers = {"Authorization": f"Bearer {tokens.get('MINISTER_POLICYMAKER')}"}
+        if contractor_list:
+            c_id = contractor_list[0]["id"]
+            r = requests.get(f"{BASE_URL}/contractor-portfolio/{c_id}", headers=headers)
+            assert r.status_code == 200
+            dossier = r.json().get("contractor", {})
+            assert "historyRecords" in dossier
+            assert "assignments" in dossier
+            assert len(dossier["historyRecords"]) >= 1, "Expected historical projects recorded"
+            print(f"[PASS] 11. Contractor Dossier: Retrieved full profile, {len(dossier['historyRecords'])} historical past projects & live assignments for '{dossier.get('companyName')}'")
+            passed_count += 1
+        else:
+            print("[FAIL] 11. Contractor Dossier: Contractor list empty")
+    except Exception as e:
+        print(f"[FAIL] 11. Contractor Dossier: {e}")
+
+    # 10. Intelligent Pre-Award Safety & Suitability Assessor Engine Test
+    total_tests += 1
+    try:
+        headers = {"Authorization": f"Bearer {tokens.get('MINISTER_POLICYMAKER')}"}
+        if contractor_list:
+            # Find an Elite/Grade A contractor (e.g. Vanguard or L&T)
+            safe_c = next((c for c in contractor_list if "GRADE_A" in c["safetyRating"]), contractor_list[0])
+            r_safe = requests.post(f"{BASE_URL}/contractor-portfolio/evaluate-safety", json={
+                "contractorProfileId": safe_c["id"],
+                "projectCode": 40001
+            }, headers=headers)
+            assert r_safe.status_code == 200
+            res_safe = r_safe.json()
+            assert res_safe["verdict"] in ["SAFE", "CONDITIONALLY_SAFE"]
+            assert res_safe["suitabilityScore"] >= 60
+            assert "dimensions" in res_safe and "recommendations" in res_safe
+
+            # Find a High-Risk / Flagged contractor (e.g. Apex)
+            high_risk_c = next((c for c in contractor_list if c["safetyRating"] == "HIGH_RISK"), None)
+            if high_risk_c:
+                r_risk = requests.post(f"{BASE_URL}/contractor-portfolio/evaluate-safety", json={
+                    "contractorProfileId": high_risk_c["id"],
+                    "projectCode": 40001
+                }, headers=headers)
+                assert r_risk.status_code == 200
+                res_risk = r_risk.json()
+                assert res_risk["verdict"] == "HIGH_RISK"
+                assert len(res_risk["riskFactors"]) >= 1
+
+            print("[PASS] 12. Pre-Award Safety Assessor: Successfully validated 5-dimensional safety scoring, risk factors & mitigation prescriptions (SAFE vs HIGH RISK discrimination)")
+            passed_count += 1
+        else:
+            print("[FAIL] 12. Pre-Award Safety Assessor: Contractor list empty")
+    except Exception as e:
+        print(f"[FAIL] 12. Pre-Award Safety Assessor: {e}")
 
     print("\n==================================================")
     print(f"ACCEPTANCE TEST RESULTS: {passed_count} / {total_tests} PASSED")

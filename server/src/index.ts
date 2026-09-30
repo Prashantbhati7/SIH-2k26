@@ -17,6 +17,7 @@ import modelRoutes from './routes/models';
 import auditRoutes from './routes/audit';
 import enrichmentRoutes from './routes/enrichment';
 import whatifRoutes from './routes/whatif';
+import contractorPortfolioRoutes from './routes/contractorPortfolio';
 
 dotenv.config();
 
@@ -53,6 +54,7 @@ app.use('/api/reports', reportRoutes);
 app.use('/api/models', modelRoutes);
 app.use('/api/audit', auditRoutes);
 app.use('/api/enrichment', enrichmentRoutes);
+app.use('/api/contractor-portfolio', contractorPortfolioRoutes);
 
 app.listen(PORT, () => {
   console.log(`==================================================`);

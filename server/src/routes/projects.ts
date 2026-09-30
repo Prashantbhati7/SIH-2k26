@@ -109,7 +109,9 @@ router.get('/:projectCode', authenticateToken, async (req: AuthRequest, res: Res
         fieldUpdates: { orderBy: { createdAt: 'desc' }, include: { fieldOfficer: true } },
         tasks: { orderBy: { createdAt: 'desc' }, include: { contractor: true } },
         targets: { orderBy: { month: 'desc' } },
-        milestones: { orderBy: { plannedDate: 'asc' } }
+        milestones: { orderBy: { plannedDate: 'asc' } },
+        contractorAssignments: { include: { contractorProfile: true } },
+        contractorEvaluations: { include: { contractorProfile: true }, orderBy: { evaluationDate: 'desc' } }
       }
     });
 

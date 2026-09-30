@@ -22,6 +22,7 @@ const models_1 = __importDefault(require("./routes/models"));
 const audit_1 = __importDefault(require("./routes/audit"));
 const enrichment_1 = __importDefault(require("./routes/enrichment"));
 const whatif_1 = __importDefault(require("./routes/whatif"));
+const contractorPortfolio_1 = __importDefault(require("./routes/contractorPortfolio"));
 dotenv_1.default.config();
 const app = (0, express_1.default)();
 const PORT = process.env.PORT || 5000;
@@ -53,6 +54,7 @@ app.use('/api/reports', reports_1.default);
 app.use('/api/models', models_1.default);
 app.use('/api/audit', audit_1.default);
 app.use('/api/enrichment', enrichment_1.default);
+app.use('/api/contractor-portfolio', contractorPortfolio_1.default);
 app.listen(PORT, () => {
     console.log(`==================================================`);
     console.log(`VikasDrishti Backend API listening on port ${PORT}`);

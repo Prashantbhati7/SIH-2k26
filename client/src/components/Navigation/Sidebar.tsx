@@ -19,7 +19,9 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   Shield,
-  Building2
+  Building2,
+  Briefcase,
+  Users2
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -238,6 +240,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
               {!isCollapsed && <span>Actions</span>}
             </div>
             {!isCollapsed && activeTab === 'interventions' && <ChevronRight className="w-3.5 h-3.5" />}
+          </button>
+
+          {/* Contractor Portfolio */}
+          <button
+            onClick={() => setActiveTab('contractor_portfolio')}
+            className={getItemClass('contractor_portfolio')}
+            title={isCollapsed ? "Contractor Portfolio" : undefined}
+          >
+            <div className="flex items-center space-x-3">
+              <Briefcase className="w-4 h-4 text-amber-400 shrink-0" />
+              {!isCollapsed && <span>Contractors</span>}
+            </div>
+            {!isCollapsed && activeTab === 'contractor_portfolio' && <ChevronRight className="w-3.5 h-3.5" />}
           </button>
 
           {/* Ask Vikas */}

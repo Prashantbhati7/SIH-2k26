@@ -13,7 +13,10 @@ import {
   ShieldAlert,
   Activity,
   Plus,
-  Sliders
+  Sliders,
+  Briefcase,
+  ShieldCheck,
+  Building2
 } from 'lucide-react';
 import { api } from '../services/api';
 import { WhatIfSimulator } from '../components/WhatIfSimulator';
@@ -701,6 +704,88 @@ export const ProjectDigitalProfile: React.FC<ProjectDigitalProfileProps> = ({
           })}
         </div>
       </div>
+
+      {/* 4.5. Assigned Contractor & Safety Assessment Dossier */}
+      {project.contractorAssignments && project.contractorAssignments.length > 0 && (
+        <div className="p-6 rounded-2xl bg-white border border-slate-200/80 shadow-xs space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
+            <div className="flex items-center space-x-2">
+              <Briefcase className="w-5 h-5 text-amber-500" />
+              <div>
+                <h2 className="text-base font-bold text-slate-900">Contractor & Pre-Award Safety Clearance</h2>
+                <p className="text-xs text-slate-500">Verified vendor track record and historical execution compliance</p>
+              </div>
+            </div>
+            <span className="text-xs font-bold text-slate-600 bg-slate-100 px-3 py-1 rounded-full">
+              {project.contractorAssignments.length} Assigned Package(s)
+            </span>
+          </div>
+
+          <div className="space-y-4">
+            {project.contractorAssignments.map((assignment: any) => {
+              const cp = assignment.contractorProfile;
+              const evalRecord = project.contractorEvaluations?.[0];
+
+              return (
+                <div key={assignment.id} className="p-5 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-4">
+                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+                    <div>
+                      <span className="text-[10px] font-mono text-slate-400 font-bold">
+                        REG: {cp?.registrationNumber || 'N/A'}
+                      </span>
+                      <h3 className="font-bold text-base text-slate-900">
+                        {cp?.companyName || 'Assigned Contractor'}
+                      </h3>
+                      <p className="text-xs text-slate-500">
+                        Package: <strong className="text-slate-700">{assignment.packageTitle}</strong> (Allocated: ₹{assignment.allocatedBudgetCrores} Cr)
+                      </p>
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-2">
+                      {evalRecord && (
+                        <span className={`px-3 py-1 rounded-full text-xs font-bold ${
+                          evalRecord.safetyVerdict === 'SAFE'
+                            ? 'bg-emerald-500/10 text-emerald-600 border border-emerald-500/20'
+                            : (evalRecord.safetyVerdict === 'CONDITIONALLY_SAFE'
+                              ? 'bg-amber-500/10 text-amber-600 border border-amber-500/20'
+                              : 'bg-red-500/10 text-red-600 border border-red-500/20')
+                        }`}>
+                          Safety Verdict: {evalRecord.safetyVerdict.replace(/_/g, ' ')} ({evalRecord.suitabilityScore}%)
+                        </span>
+                      )}
+                      <span className="px-3 py-1 rounded-full text-xs font-bold bg-lime-400/20 text-slate-900 border border-lime-400/40">
+                        Rating: {cp?.safetyRating?.replace(/_/g, ' ') || 'Grade A'}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Contractor Track Record Mini Metrics */}
+                  {cp && (
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs pt-1">
+                      <div className="p-3 bg-white rounded-xl border border-slate-200">
+                        <span className="text-[10px] text-slate-400 block font-semibold">On-Time Velocity</span>
+                        <span className="font-black text-slate-900 text-sm">{cp.onTimeCompletionRate}%</span>
+                      </div>
+                      <div className="p-3 bg-white rounded-xl border border-slate-200">
+                        <span className="text-[10px] text-slate-400 block font-semibold">Historical Delay Avg</span>
+                        <span className="font-black text-slate-900 text-sm">{cp.historicalDelayAvgMonths} mo</span>
+                      </div>
+                      <div className="p-3 bg-white rounded-xl border border-slate-200">
+                        <span className="text-[10px] text-slate-400 block font-semibold">Cost Overrun Avg</span>
+                        <span className="font-black text-slate-900 text-sm">+{cp.historicalCostOverrunAvg}%</span>
+                      </div>
+                      <div className="p-3 bg-white rounded-xl border border-slate-200">
+                        <span className="text-[10px] text-slate-400 block font-semibold">Completed Works</span>
+                        <span className="font-black text-slate-900 text-sm">{cp.totalProjectsCompleted} Projects</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* 5. Warnings & Interventions */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

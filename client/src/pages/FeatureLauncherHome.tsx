@@ -11,7 +11,8 @@ import {
   HardHat,
   UserCheck,
   FileText,
-  History
+  History,
+  Briefcase
 } from 'lucide-react';
 
 interface FeatureLauncherHomeProps {
@@ -228,6 +229,15 @@ export const FeatureLauncherHome: React.FC<FeatureLauncherHomeProps> = ({
         onClick: () => setActiveTab('interventions'),
         accentBg: 'bg-slate-900',
         accentText: 'text-emerald-400'
+      },
+      {
+        id: 'contractors',
+        title: 'Contractor Portfolio',
+        description: 'Manage contractor profiles, track record history & safety assessment',
+        icon: Briefcase,
+        onClick: () => setActiveTab('contractor_portfolio'),
+        accentBg: 'bg-slate-900',
+        accentText: 'text-amber-400'
       },
       {
         id: 'ask_vikas',

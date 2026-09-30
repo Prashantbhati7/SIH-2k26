@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs';
 import fs from 'fs';
 import path from 'path';
 import { parse } from 'csv-parse/sync';
+import { seedContractors } from './seed_contractors';
 
 const prisma = new PrismaClient();
 
@@ -325,9 +326,11 @@ async function main() {
           verificationStatus: 'VERIFIED'
         }
       });
-      console.log('Seeded demo task, milestone, and field update records for project 40001.');
     }
   }
+
+  // Seed Contractor Portfolio
+  await seedContractors();
 
   console.log('VikasDrishti Database Seed Completed Successfully!');
 }
